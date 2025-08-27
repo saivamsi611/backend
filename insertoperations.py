@@ -24,6 +24,10 @@ def insert_csv_to_transactions_table(csv_file_path,project_name):
 
     conn.commit()
     conn.close()
+
+
+
+    
 def save_project_summary(project_name, total_samples, fraud_count, accuracy, f1_score, auc, status="Completed"):
     try:
         conn = sqlite3.connect('database.db')

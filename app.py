@@ -270,6 +270,25 @@ def view_users():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
+
+@app.route("/view_transactions", methods=["GET"])
+def view_transactions():
+    try:
+        conn = sqlite3.connect("database.db")
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+
+        # Fetch all rows from transactions table
+        cursor.execute("SELECT * FROM transactions")
+        rows = cursor.fetchall()
+        conn.close()
+
+        transactions = [dict(row) for row in rows]
+        return jsonify({"status": "success", "transactions": transactions}), 200
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 # ------------- Initialization outside __main__ ------------- #
 # This ensures DB tables are ready on import (for Gunicorn)
 create_csv_table()
