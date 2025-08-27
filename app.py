@@ -231,11 +231,16 @@ def get_all_projects():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 # ---------------- Main ---------------- #
+import os
 import eventlet
 eventlet.monkey_patch()
+
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")
 
 if __name__ == "__main__":
     create_csv_table()
     createtable()
     create_project_summary_table()
-    socketio.run(app, host="0.0.0.0", port=5000)
+    
+    port = int(os.environ.get("PORT", 8080))
+    socketio.run(app, host="0.0.0.0", port=port)
