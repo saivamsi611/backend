@@ -12,3 +12,4 @@ Werkzeug
 eventlet
 python-socketio
 python-engineio
+gunicorn
