@@ -1,12 +1,15 @@
 import sqlite3
 import pandas as pd
 
+import sqlite3
+import pandas as pd
+import os
+
 def insert_csv_to_transactions_table(file_path, project_name):
     try:
         conn = sqlite3.connect("database.db")
         cursor = conn.cursor()
 
-        # Define columns you expect
         required_columns = [
             "Time", "V1", "V2", "V3", "V4", "V5", "V6",
             "V7", "V8", "V9", "V10", "V11", "V12", "V13",
@@ -15,29 +18,33 @@ def insert_csv_to_transactions_table(file_path, project_name):
             "V28", "Amount", "Class"
         ]
 
-        # ✅ Process CSV in chunks of 5000 rows
+        # Read CSV in chunks
         chunksize = 5000
         for chunk in pd.read_csv(file_path, chunksize=chunksize):
-            # Convert each chunk to list of tuples
+            # Check for missing columns in this chunk
+            missing_cols = [col for col in required_columns if col not in chunk.columns]
+            if missing_cols:
+                raise ValueError(f"Missing columns in CSV chunk: {missing_cols}")
+
+            # Prepare data safely
             data = []
             for _, row in chunk.iterrows():
-                data.append((project_name, *[row[col] for col in required_columns]))
+                row_data = [row.get(col, None) for col in required_columns]  # safer
+                data.append((project_name, *row_data))
 
-            # Bulk insert for performance
-            cursor.executemany(f'''
-                INSERT INTO transactions 
+            # Bulk insert
+            cursor.executemany(
+                f'''INSERT INTO transactions
                 (project_name, {", ".join(required_columns)})
-                VALUES ({",".join(["?"] * (len(required_columns) + 1))})
-            ''', data)
-
-            conn.commit()  # commit each chunk
+                VALUES ({",".join(["?"] * (len(required_columns) + 1))})''',
+                data
+            )
+            conn.commit()
 
         conn.close()
-
-        # Optionally delete file after processing
         os.remove(file_path)
 
-        return {"status": "success", "message": "CSV uploaded in chunks"}
+        return {"status": "success", "message": "CSV uploaded in chunks safely."}
 
     except Exception as e:
         return {"status": "error", "message": str(e)}
