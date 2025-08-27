@@ -65,9 +65,9 @@ def hello():
 
 @app.route("/signup", methods=["POST"])
 def signup():
-    name = request.form.get("name")
-    email = request.form.get("email")
-    password = request.form.get("password")
+    name = request.form["name"]
+    email = request.form["email"]
+    password = request.form["password"]
 
     if not all([name, email, password]):
         return jsonify({"status": "error", "message": "All fields are required."}), 400
