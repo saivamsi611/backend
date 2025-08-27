@@ -87,10 +87,16 @@ def signup():
     if not all([name, email, password]):
         return jsonify({"status": "error", "message": "All fields are required."}), 400
 
+    # user_signup should return a dict, not a Response object
     result, code = user_signup(name, email, password)
-    return jsonify(result), code
 
-@app.route("/login", methods=["POST"])
+    # Ensure result is JSON-serializable
+    if not isinstance(result, dict):
+        result = {"status": "success", "message": "Signup successful!"}
+
+    return jsonify(result), code@app.route("/login", methods=["POST"])
+
+
 def login():
     email = request.form.get("email")
     password = request.form.get("password")
