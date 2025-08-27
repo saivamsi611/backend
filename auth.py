@@ -25,7 +25,7 @@ def user_signup(username,email,password):
         cursor.execute("INSERT INTO users (username, email, password) VALUES (?, ?, ?)", (username, email, password))
         conn.commit()
         conn.close()
-        return ({"message": "User created successfully!"}, 201)
+        return {"status": "success", "message": "User created successfully!"}, 201
     except Exception as e:
         print("Error signing up user:", e)
         return ({"message": "User creation failed!"},500)

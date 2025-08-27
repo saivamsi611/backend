@@ -78,23 +78,31 @@ def hello():
 def health_check():
     return jsonify({"status": "OK"}), 200
 
+
 @app.route("/signup", methods=["POST"])
 def signup():
-    name = request.form.get("name")
-    email = request.form.get("email")
-    password = request.form.get("password")
+    try:
+        name = request.form.get("name")
+        email = request.form.get("email")
+        password = request.form.get("password")
 
-    if not all([name, email, password]):
-        return jsonify({"status": "error", "message": "All fields are required."}), 400
+        # Basic validation
+        if not all([name, email, password]):
+            return jsonify({"status": "error", "message": "All fields are required."}), 400
 
-    # user_signup should return a dict, not a Response object
-    result, code = user_signup(name, email, password)
+        # Call your user signup function
+        result, code = user_signup(name, email, password)
 
-    # Ensure result is JSON-serializable
-    if not isinstance(result, dict):
-        result = {"status": "success", "message": "Signup successful!"}
+        # Ensure result is a dict, else wrap it
+        if not isinstance(result, dict):
+            result = {"status": "success", "message": "Signup successful!"}
+            code = 201
 
-    return jsonify(result), code@app.route("/login", methods=["POST"])
+        return jsonify(result), code
+
+    except Exception as e:
+        # Catch unexpected errors and return JSON response
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 
 def login():
