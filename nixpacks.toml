@@ -2,7 +2,6 @@
 nixPkgs = [
   "python3",
   "gcc",
-  "gfortran",
   "libffi",
   "pkg-config",
   "blas",
