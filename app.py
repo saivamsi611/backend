@@ -105,6 +105,7 @@ def signup():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
+
 def login():
     email = request.form.get("email")
     password = request.form.get("password")
@@ -114,6 +115,8 @@ def login():
 
     result, code = login_user(email, password)
     return jsonify(result), code
+
+
 
 @app.route("/forget_password", methods=["POST"])
 def forget_user_password():
