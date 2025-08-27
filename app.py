@@ -21,11 +21,23 @@ eventlet.monkey_patch()
 
 # Initialize Flask app and load environment variables
 app = Flask(__name__)
-CORS(app)
 load_dotenv()
 
-# Initialize SocketIO with eventlet support
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")
+# --- CORS Setup ---
+# Allow only your frontend origin, enable credentials for cookies if needed
+CORS(app, resources={r"/*": {"origins": ["http://localhost:5173"]}}, supports_credentials=True)
+
+# Add CORS headers on all responses explicitly (helps with some edge cases)
+@app.after_request
+def add_cors_headers(response):
+    response.headers.add("Access-Control-Allow-Origin", "http://localhost:5173")
+    response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
+    response.headers.add("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
+    response.headers.add("Access-Control-Allow-Credentials", "true")
+    return response
+
+# Initialize SocketIO with eventlet support and CORS allowed origins
+socketio = SocketIO(app, cors_allowed_origins=["http://localhost:5173"], async_mode="eventlet")
 
 # Store task results in memory
 task_results = {}
