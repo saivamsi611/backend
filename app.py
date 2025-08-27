@@ -236,6 +236,25 @@ def get_all_projects():
 
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+    
+
+@app.route("/view-users", methods=["GET"])
+def view_users():
+    try:
+        conn = sqlite3.connect("database.db")
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM users")
+        rows = cursor.fetchall()
+        conn.close()
+
+        users = [dict(row) for row in rows]
+        return jsonify({"status": "success", "users": users}), 200
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 
 # ------------- Initialization outside __main__ ------------- #
 # This ensures DB tables are ready on import (for Gunicorn)
